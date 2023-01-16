@@ -1,3 +1,19 @@
-from distutils.core import setup
+from setuptools import find_packages
+from setuptools import setup
 
-setup(name='test', version='0.1', author='Matviiv Kirill', author_email='matviiv67@gmail.com', packages=['app'],)
+setup(
+    name='test',
+    description="CI test",
+    author='matvuric',
+    url='',
+    packages=find_packages('src'),
+    package_dir={
+        '': 'src'},
+    include_package_data=True,
+    keywords=[
+        'web_app', 'test', 'flask'
+    ],
+    entry_points={
+        'console_scripts': [
+            'web_server = app:main']},
+)
