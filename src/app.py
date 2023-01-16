@@ -9,8 +9,16 @@ def validate_post_data(data: dict) -> bool:
         return False
     if not data.get('name') or not isinstance(data['name'], str):
         return False
+    if data.get('surname') and not isinstance(data['surname'], str):
+        return False
     if data.get('age') and not isinstance(data['age'], int):
         return False
+    if not data.get('passport') or not isinstance(data['passport'], str):
+        return False
+    else:
+        lst = str(data.get('passport')).split(' ')
+        if len(lst[0]) != 4 or len(lst[1]) != 6:
+            return False
     return True
 
 
@@ -21,15 +29,6 @@ def hello():
 
 @app.route('/api', methods=['GET', 'POST'])
 def api():
-    """
-    /api entpoint
-    GET - returns json= {'status': 'test'}
-    POST -  {
-            name - str not null
-            age - int optional
-            }
-    :return:
-    """
     if request.method == 'GET':
         return jsonify({'status': 'test'})
     elif request.method == 'POST':

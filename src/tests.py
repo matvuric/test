@@ -24,20 +24,26 @@ class FlaskAppTests(unittest.TestCase):
     def test_correct_post_api_endpoint(self):
         r = self.app.post('/api',
                           content_type='application/json',
-                          data=json.dumps({'name': 'Den', 'age': 100}))
+                          data=json.dumps({'name': 'X', 'passport': '1234 111111'}))
         self.assertEqual(r.json, {'status': 'OK'})
         self.assertEqual(r.status_code, 200)
 
         r = self.app.post('/api',
                           content_type='application/json',
-                          data=json.dumps({'name': 'Den'}))
+                          data=json.dumps({'name': 'X', 'surname': 'Y', 'passport': '1234 111111'}))
+        self.assertEqual(r.json, {'status': 'OK'})
+        self.assertEqual(r.status_code, 200)
+
+        r = self.app.post('/api',
+                          content_type='application/json',
+                          data=json.dumps({'name': 'X', 'surname': 'Y', 'age': 20, 'passport': '1234 111111'}))
         self.assertEqual(r.json, {'status': 'OK'})
         self.assertEqual(r.status_code, 200)
 
     def test_not_dict_post_api_endpoint(self):
         r = self.app.post('/api',
                           content_type='application/json',
-                          data=json.dumps([{'name': 'Den'}]))
+                          data=json.dumps([{'name': 'X', 'passport': '1234 111111'}]))
         self.assertEqual(r.json, {'status': 'bad input'})
         self.assertEqual(r.status_code, 400)
 
@@ -45,6 +51,13 @@ class FlaskAppTests(unittest.TestCase):
         r = self.app.post('/api',
                           content_type='application/json',
                           data=json.dumps({'age': 100}))
+        self.assertEqual(r.json, {'status': 'bad input'})
+        self.assertEqual(r.status_code, 400)
+
+    def test_no_passport_post_api_endpoint(self):
+        r = self.app.post('/api',
+                          content_type='application/json',
+                          data=json.dumps({'name': 'X', 'age': 20}))
         self.assertEqual(r.json, {'status': 'bad input'})
         self.assertEqual(r.status_code, 400)
 
