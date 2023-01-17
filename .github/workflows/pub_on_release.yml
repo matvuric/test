@@ -39,9 +39,16 @@ jobs:
     needs: [build_and_pub]
     runs-on: [ubuntu-latest]
     steps:
-      - name: Set tag to env
-        run: echo ::set-env name=RELEASE_VERSION::$(echo ${GITHUB_REF:11})
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-      - name: Send webhook for deploy
-        run: "curl --silent --show-error --fail -X POST ${{ secrets.DEPLOYMENT_SERVER }} -H 'Authorization: ${{ secrets.DEPLOYMENT_TOKEN }}' -H 'Content-Type: application/json' -d '{\"owner\": \"${{ secrets.DOCKER_LOGIN }}\", \"repository\": \"${{ secrets.DOCKER_NAME }}\", \"tag\": \"${{ env.RELEASE_VERSION }}\", \"ports\": {\"8080\": 8080}}'"
+      - name: Set env
+        run: echo "VERSION=${GITHUB_REF:11}" >> $GITHUB_ENV
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_SSH_HOST }}
+          username: ${{ secrets.VPS_SSH_USERNAME }}
+          key: ${{ secrets.VPS_SSH_SECRET }}
+          script: |
+            docker rm --force /test
+            docker pull ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:${{ env.VERSION }}
+            docker run --name test -p 80:8080 -d ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:${{ env.VERSION }}
+            docker image prune -f
